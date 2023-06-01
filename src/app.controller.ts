@@ -12,7 +12,12 @@ export class AppController {
 
   @Get()
   async getHello(): Promise<any> {
-    const res: any = await this.conn.query('SELECT CURRENT_DATE;');
-    return res.rows[0].current_date;
+    try {
+      const res: any = await this.conn.query('SELECT * FROM users;');
+      return res.rows;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
   }
 }
