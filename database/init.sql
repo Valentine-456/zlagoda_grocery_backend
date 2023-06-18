@@ -38,7 +38,9 @@ CREATE TABLE IF NOT EXISTS Employee (
   phone_number VARCHAR(13) NOT NULL,
   city VARCHAR(50) NOT NULL,
   street VARCHAR(50) NOT NULL,
-  zip_code VARCHAR(9) NOT NULL
+  zip_code VARCHAR(9) NOT NULL,
+  username VARCHAR(20) UNIQUE,
+  pass VARCHAR(100) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS public.Check (
