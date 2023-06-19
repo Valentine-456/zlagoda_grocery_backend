@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ProductDto } from './dto/product.dto';
 import { Pool, QueryResult } from 'pg';
 import { PG_CONNECTION } from 'src/db/db.module';
+import { APIQueryParams } from 'src/common/QueryParamUtils';
 
 @Injectable()
 export class ProductService {
@@ -16,9 +17,9 @@ export class ProductService {
     return result.rows[0];
   }
 
-  async findAll() {
+  async findAll({ sortBy }: APIQueryParams) {
     const result: QueryResult = await this.dbPool.query(
-      'SELECT * FROM Product;',
+      `SELECT * FROM Product ${sortBy};`,
     );
     return result.rows;
   }

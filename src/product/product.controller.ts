@@ -7,9 +7,11 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { ProductDto } from './dto/product.dto';
+import { QueryParamUtils } from 'src/common/QueryParamUtils';
 
 @Controller('/product')
 export class ProductController {
@@ -21,8 +23,9 @@ export class ProductController {
   }
 
   @Get()
-  async findAll() {
-    return await this.productService.findAll();
+  async findAll(@Query('sortBy') sortBy?: string) {
+    const sqlSortBy: string = QueryParamUtils.sortByParamToSQL(sortBy);
+    return await this.productService.findAll({ sortBy: sqlSortBy });
   }
 
   @Get(':id')

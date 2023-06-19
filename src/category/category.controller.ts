@@ -7,9 +7,11 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Query,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CategoryDto } from './dto/category.dto';
+import { QueryParamUtils } from 'src/common/QueryParamUtils';
 
 @Controller('/category')
 export class CategoryController {
@@ -21,8 +23,9 @@ export class CategoryController {
   }
 
   @Get()
-  async findAll() {
-    return await this.categoryService.findAll();
+  async findAll(@Query('sortBy') sortBy?: string) {
+    const sortBySQL = QueryParamUtils.sortByParamToSQL(sortBy);
+    return await this.categoryService.findAll({ sortBy: sortBySQL });
   }
 
   @Get(':id')
