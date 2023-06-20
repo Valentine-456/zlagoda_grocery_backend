@@ -6,6 +6,7 @@ import { ProductModule } from './product/product.module';
 import { CustomerCardModule } from './customer-card/customer-card.module';
 import { EmployeeModule } from './employee/employee.module';
 import { StoreProductModule } from './store-product/store-product.module';
+import { CheckModule } from './check/check.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { StoreProductModule } from './store-product/store-product.module';
     CustomerCardModule,
     EmployeeModule,
     StoreProductModule,
+    CheckModule,
   ],
   controllers: [],
   providers: [],

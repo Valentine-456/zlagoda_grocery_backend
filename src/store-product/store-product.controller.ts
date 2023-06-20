@@ -12,7 +12,7 @@ import {
 import { StoreProductService } from './store-product.service';
 import { StoreProductDto } from './dto/store-product.dto';
 import { QueryParamUtils } from 'src/common/QueryParamUtils';
-import { StoreProduct } from './entities/StoreProduct';
+import { StoreProduct } from './entities/store-product.entity';
 
 @Controller('store-product')
 export class StoreProductController {
