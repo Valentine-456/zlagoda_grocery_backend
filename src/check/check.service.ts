@@ -4,6 +4,7 @@ import { Pool, QueryResult } from 'pg';
 import { PG_CONNECTION } from 'src/db/db.module';
 import { APIQueryParams } from 'src/common/QueryParamUtils';
 import { Check } from './entities/check.entity';
+import { SaleExpanded } from './entities/sale.entity';
 
 @Injectable()
 export class CheckService {
@@ -32,25 +33,60 @@ export class CheckService {
 
   async findAll({ sortBy }: APIQueryParams) {
     const result = await this.dbPool.query(
-      `SELECT * FROM public.Check AS Ch
-      INNER JOIN Sale ON Ch.check_number = Sale.check_number
-      LEFT JOIN Store_Product ON Store_Product.UPC = Sale.UPC
-      INNER JOIN Product ON Product.id_product = Store_Product.id_product
+      `SELECT * FROM public.Check
        ${sortBy};`,
     );
     return result.rows;
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<Array<SaleExpanded>> {
     const result = await this.dbPool.query(
       `SELECT * FROM public.Check AS Ch
-      INNER JOIN Sale ON Ch.check_number = Sale.check_number
+      LEFT JOIN Sale ON Ch.check_number = Sale.check_number
       LEFT JOIN Store_Product ON Store_Product.UPC = Sale.UPC
-      INNER JOIN Product ON Product.id_product = Store_Product.id_product
+      LEFT JOIN Product ON Product.id_product = Store_Product.id_product
       WHERE Ch.check_number = $1;`,
       [id],
     );
     return result.rows;
+  }
+
+  async getAllChecksWithinDate(
+    id_employee: string = null,
+    fromDate: string,
+    toDate: string,
+  ) {
+    const searchByEmployeeId =
+      id_employee != null ? ` Ch.id_employee = '${id_employee}' AND ` : ' ';
+    const result = await this.dbPool.query(
+      `SELECT * FROM public.Check AS Ch
+      WHERE ${searchByEmployeeId} Ch.print_date BETWEEN '${fromDate}' AND '${toDate}';`,
+    );
+    return result.rows;
+  }
+
+  async getTotalSumOfAllChecks(
+    fromDate: string,
+    toDate: string,
+  ): Promise<number> {
+    const result = await this.dbPool.query(
+      `SELECT SUM(sum_total) FROM public.Check AS Ch
+      WHERE Ch.print_date BETWEEN '${fromDate}' AND '${toDate}';`,
+    );
+    return result.rows[0].sum;
+  }
+
+  async getTotalSumOfChecksByEmployeeId(
+    id: string,
+    fromDate: string,
+    toDate: string,
+  ): Promise<number> {
+    const result = await this.dbPool.query(
+      `SELECT SUM(sum_total) FROM public.Check AS Ch
+      WHERE Ch.id_employee = '${id}' 
+      AND Ch.print_date BETWEEN '${fromDate}' AND '${toDate}';`,
+    );
+    return result.rows[0].sum;
   }
 
   async update(

@@ -6,6 +6,7 @@ import {
   Param,
   Delete,
   Query,
+  BadRequestException,
 } from '@nestjs/common';
 import { CheckService } from './check.service';
 import { CheckDto } from './dto/check.dto';
@@ -41,18 +42,122 @@ export class CheckController {
     });
   }
 
-  // TODO:
-  // ?DELETE
   @Get()
   async findAll(@Query('sortBy') sortByQuery?: string) {
     const sortBy = QueryParamUtils.sortByParamToSQL(sortByQuery);
     return await this.checkService.findAll({ sortBy });
   }
 
-  // TODO:
+  @Get('/within')
+  async findAllChecks(
+    @Query('fromDate') fromDate: string,
+    @Query('toDate') toDate: string,
+  ) {
+    if (!(fromDate || toDate))
+      throw new BadRequestException(
+        '"fromDate" and "toDate" query parameters are empty',
+        {
+          description: 'You need to specify both for this enpoint',
+        },
+      );
+    return await this.checkService.getAllChecksWithinDate(
+      null,
+      fromDate,
+      toDate,
+    );
+  }
+
+  @Get('/within/:id')
+  async findAllChecksByEmployee(
+    @Param('id') id: string,
+    @Query('fromDate') fromDate: string,
+    @Query('toDate') toDate: string,
+  ) {
+    if (!(fromDate || toDate))
+      throw new BadRequestException(
+        '"fromDate" and "toDate" query parameters are empty',
+        {
+          description: 'You need to specify both for this enpoint',
+        },
+      );
+    return await this.checkService.getAllChecksWithinDate(id, fromDate, toDate);
+  }
+
+  @Get('sum/within')
+  async findSumOfAllChecks(
+    @Param('id') id: string,
+    @Query('fromDate') fromDate: string,
+    @Query('toDate') toDate: string,
+  ) {
+    if (!(fromDate || toDate))
+      throw new BadRequestException(
+        '"fromDate" and "toDate" query parameters are empty',
+        {
+          description: 'You need to specify both for this enpoint',
+        },
+      );
+    return await this.checkService.getTotalSumOfAllChecks(fromDate, toDate);
+  }
+
+  @Get('sum/within/:id')
+  async findSumOfChecksByCashierId(
+    @Param('id') id: string,
+    @Query('fromDate') fromDate: string,
+    @Query('toDate') toDate: string,
+  ) {
+    if (!(fromDate || toDate))
+      throw new BadRequestException(
+        '"fromDate" and "toDate" query parameters are empty',
+        {
+          description: 'You need to specify both for this enpoint',
+        },
+      );
+    return await this.checkService.getTotalSumOfChecksByEmployeeId(
+      id,
+      fromDate,
+      toDate,
+    );
+  }
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.checkService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const salesExpanded = await this.checkService.findOne(id);
+    if (salesExpanded.length == 0) return '';
+    const {
+      vat,
+      sum_total,
+      print_date,
+      card_number,
+      id_employee,
+      check_number,
+    } = salesExpanded[0];
+    const check = {
+      vat,
+      sum_total,
+      print_date,
+      card_number,
+      id_employee,
+      check_number,
+      sales: [],
+    };
+    check.sales = salesExpanded.map(
+      ({
+        product_name,
+        charachteristics,
+        upc,
+        selling_price,
+        product_number,
+        promotional_product,
+      }) => ({
+        product_name,
+        charachteristics,
+        upc,
+        selling_price,
+        product_number,
+        promotional_product,
+      }),
+    );
+    return check;
   }
 
   @Delete(':id')

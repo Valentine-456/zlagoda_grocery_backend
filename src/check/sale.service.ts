@@ -44,9 +44,6 @@ export class SaleService {
     }
   }
 
-  // TODO:
-  // async getAllByCheckId(){}
-
   async getSumOfSalesByManyChecks(checksIDs: Array<string>): Promise<number> {
     let checksIDsSQL = `( `;
     checksIDs.forEach((id, i) => {
@@ -54,37 +51,10 @@ export class SaleService {
       else checksIDsSQL += `'${id}' )`;
     });
 
-    console.log(`SELECT SUM(selling_price * product_number) FROM Sale
-    WHERE check_number IN ${checksIDsSQL};`);
-
     const result = await this.dbPool.query(
       `SELECT SUM(selling_price * product_number) FROM Sale
       WHERE check_number IN ${checksIDsSQL};`,
     );
-    console.log(result);
     return result.rows[0].sum;
   }
-
-  //   async findAll({ sortBy }: APIQueryParams) {
-  //     const result = await this.dbPool.query(
-  //       `SELECT * FROM public.Check AS Ch
-  //           INNER JOIN Sale ON Ch.check_number = Sale.check_number
-  //           LEFT JOIN Store_Product ON Store_Product.UPC = Sale.UPC
-  //           INNER JOIN Product ON Product.id_product = Store_Product.id_product
-  //            ${sortBy};`,
-  //     );
-  //     return result.rows;
-  //   }
-
-  //   async findOne(id: string) {
-  //     const result = await this.dbPool.query(
-  //       `SELECT * FROM public.Check AS Ch
-  //           INNER JOIN Sale ON Ch.check_number = Sale.check_number
-  //           LEFT JOIN Store_Product ON Store_Product.UPC = Sale.UPC
-  //           INNER JOIN Product ON Product.id_product = Store_Product.id_product
-  //           WHERE Ch.check_number = $1;`,
-  //       [id],
-  //     );
-  //     return result.rows;
-  //   }
 }
