@@ -23,9 +23,17 @@ export class ProductController {
   }
 
   @Get()
-  async findAll(@Query('sortBy') sortBy?: string) {
+  async findAll(
+    @Query('sortBy') sortBy?: string,
+    @Query('category') category: string = null,
+  ) {
     const sqlSortBy: string = QueryParamUtils.sortByParamToSQL(sortBy);
-    return await this.productService.findAll({ sortBy: sqlSortBy });
+    return await this.productService.findAll({ sortBy: sqlSortBy, category });
+  }
+
+  @Get('searchByName/:name')
+  async findByName(@Param('name') name: string) {
+    return await this.productService.findByName(name);
   }
 
   @Get(':id')

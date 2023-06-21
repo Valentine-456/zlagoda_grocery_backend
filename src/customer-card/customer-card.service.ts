@@ -52,6 +52,13 @@ export class CustomerCardService {
     return result.rows;
   }
 
+  async findBySurname(surname: string) {
+    const result = await this.dbPool.query(
+      `SELECT * FROM Customer_Card WHERE cust_surname = '${surname}';`,
+    );
+    return result.rows;
+  }
+
   async findOne(id: string) {
     const template = 'SELECT * FROM Customer_Card WHERE card_number = $1;';
     const params = [id];

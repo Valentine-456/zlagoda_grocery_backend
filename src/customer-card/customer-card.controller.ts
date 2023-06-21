@@ -27,6 +27,11 @@ export class CustomerCardController {
     return this.customerCardService.findAll({ sortBy: sortBySQL });
   }
 
+  @Get('searchBySurname/:surname')
+  findBySurname(@Param('surname') surname: string) {
+    return this.customerCardService.findBySurname(surname);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.customerCardService.findOne(id);

@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { EmployeeDto } from './dto/employee.dto';
 import { APIQueryParams } from 'src/common/QueryParamUtils';
 import { PG_CONNECTION } from 'src/db/db.module';
-import { Pool } from 'pg';
+import { Pool, QueryResult } from 'pg';
 
 @Injectable()
 export class EmployeeService {
@@ -62,6 +62,20 @@ export class EmployeeService {
 
   async findAll({ sortBy }: APIQueryParams) {
     const result = await this.dbPool.query(`SELECT * FROM Employee ${sortBy};`);
+    return result.rows;
+  }
+
+  async findAllByPosition(role: string, { sortBy }: APIQueryParams) {
+    const result = await this.dbPool.query(
+      `SELECT * FROM Employee WHERE empl_role = '${role}' ${sortBy};`,
+    );
+    return result.rows;
+  }
+
+  async findBySurname(surname: string): Promise<Array<EmployeeDto>> {
+    const result: QueryResult<EmployeeDto> = await this.dbPool.query(
+      `SELECT * FROM Employee WHERE empl_surname = '${surname}';`,
+    );
     return result.rows;
   }
 

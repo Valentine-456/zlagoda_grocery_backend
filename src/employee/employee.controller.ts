@@ -7,11 +7,13 @@ import {
   Param,
   Delete,
   Query,
+  ParseEnumPipe,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { EmployeeDto } from './dto/employee.dto';
 import { QueryParamUtils } from 'src/common/QueryParamUtils';
 import { PassEncryptionUtils } from 'src/common/PassEncryptionUtils';
+import { EmployeeRoles } from './entities/employee.roles';
 
 @Controller('employee')
 export class EmployeeController {
@@ -30,6 +32,40 @@ export class EmployeeController {
   findAll(@Query('sortBy') sortByQuery?: string) {
     const sortBy = QueryParamUtils.sortByParamToSQL(sortByQuery);
     return this.employeeService.findAll({ sortBy });
+  }
+
+  @Get('position/:role')
+  findAllEmployees(
+    @Param('role', new ParseEnumPipe(EmployeeRoles)) role: string,
+    @Query('sortBy') sortByQuery?: string,
+  ) {
+    const sortBy = QueryParamUtils.sortByParamToSQL(sortByQuery);
+    return this.employeeService.findAllByPosition(role, { sortBy });
+  }
+
+  @Get('searchBySurname/:surname')
+  async findContactsBySurname(@Param('surname') surname: string) {
+    const employees = await this.employeeService.findBySurname(surname);
+    const contacts = employees.map(
+      ({
+        empl_name,
+        empl_surname,
+        id_employee,
+        phone_number,
+        city,
+        street,
+        zip_code,
+      }) => ({
+        empl_name,
+        id_employee,
+        empl_surname,
+        phone_number,
+        city,
+        street,
+        zip_code,
+      }),
+    );
+    return contacts;
   }
 
   @Get(':id')

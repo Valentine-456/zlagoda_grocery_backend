@@ -2,7 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { ProductDto } from './dto/product.dto';
 import { Pool, QueryResult } from 'pg';
 import { PG_CONNECTION } from 'src/db/db.module';
-import { APIQueryParams } from 'src/common/QueryParamUtils';
+import { ProductAPIQueryParams } from './interfaces/ProductAPIQueryParams';
 
 @Injectable()
 export class ProductService {
@@ -17,15 +17,30 @@ export class ProductService {
     return result.rows[0];
   }
 
-  async findAll({ sortBy }: APIQueryParams) {
+  async findAll({ sortBy, category = null }: ProductAPIQueryParams) {
+    const searchByCategory =
+      category != null ? ` WHERE category_name = '${category}' ` : ' ';
     const result: QueryResult = await this.dbPool.query(
-      `SELECT * FROM Product ${sortBy};`,
+      `SELECT * FROM Product 
+      INNER JOIN Category ON Product.category_number = Category.category_number  
+      ${searchByCategory}
+      ${sortBy};`,
     );
     return result.rows;
   }
 
+  async findByName(name: string) {
+    const template = `SELECT * FROM Product 
+      INNER JOIN Category ON Product.category_number = Category.category_number 
+      WHERE "product_name" ILIKE '${name}%';`;
+    const result = await this.dbPool.query(template);
+    return result.rows;
+  }
+
   async findOne(id: number) {
-    const template = 'SELECT * FROM Product WHERE "id_product" = $1;';
+    const template = `SELECT * FROM Product 
+      INNER JOIN Category ON Product.category_number = Category.category_number 
+      WHERE "id_product" = $1;`;
     const params = [id];
     const result = await this.dbPool.query(template, params);
     return result.rows[0];
