@@ -8,7 +8,17 @@ export class SaleService {
   constructor(@Inject(PG_CONNECTION) private readonly dbPool: Pool) {}
 
   async create({ upc, check_number, product_number }: Sale) {
-    const template = `INSERT INTO Sale(
+    const client = await this.dbPool.connect();
+    try {
+      await client.query('BEGIN');
+
+      const templateUpdate = `UPDATE Store_Product SET
+        products_nubmer = products_nubmer - $2
+        WHERE UPC = $1;`;
+      const paramsUpdate = [upc, product_number];
+      await client.query(templateUpdate, paramsUpdate);
+
+      const templateInsert = `INSERT INTO Sale(
         UPC,
         check_number,
         product_number,
@@ -22,11 +32,20 @@ export class SaleService {
             FROM Store_Product
             WHERE Store_Product.UPC = $1::VARCHAR
       )) RETURNING *;`;
-    //  CASE WHEN id IN (1, 2, 3, 4, 5, 6) THEN 1 ELSE 0 END
-    const params = [upc, check_number, product_number];
-    const result = await this.dbPool.query(template, params);
-    return result.rows[0];
+      const paramsInsert = [upc, check_number, product_number];
+      await client.query(templateInsert, paramsInsert);
+
+      await client.query('COMMIT');
+    } catch (error) {
+      await client.query('ROLLBACK');
+      throw error;
+    } finally {
+      client.release();
+    }
   }
+
+  // TODO:
+  // async getAllByCheckId(){}
 
   async getSumOfSalesByManyChecks(checksIDs: Array<string>): Promise<number> {
     let checksIDsSQL = `( `;

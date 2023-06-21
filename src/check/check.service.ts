@@ -65,9 +65,11 @@ export class CheckService {
   ) {
     const template = `UPDATE public.Check SET
       id_employee = $2,
-      card_number = $3,
+      card_number = $3::VARCHAR,
       print_date = $4,
-      sum_total = $5
+      sum_total = $5 * COALESCE( (100 - (
+        SELECT percent FROM Customer_Card WHERE card_number = $3::VARCHAR
+      )) /100 ::NUMERIC, 1)::NUMERIC
     WHERE check_number = $1 RETURNING *;`;
     const params = [
       check_number,
