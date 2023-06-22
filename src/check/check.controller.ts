@@ -7,12 +7,15 @@ import {
   Delete,
   Query,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { CheckService } from './check.service';
 import { CheckDto } from './dto/check.dto';
 import { QueryParamUtils } from 'src/common/QueryParamUtils';
 import { SaleService } from './sale.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('check')
 export class CheckController {
   constructor(

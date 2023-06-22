@@ -8,13 +8,16 @@ import {
   Delete,
   Query,
   ParseEnumPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { EmployeeDto } from './dto/employee.dto';
 import { QueryParamUtils } from 'src/common/QueryParamUtils';
 import { PassEncryptionUtils } from 'src/common/PassEncryptionUtils';
 import { EmployeeRoles } from './entities/employee.roles';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}

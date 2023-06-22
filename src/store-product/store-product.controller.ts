@@ -8,12 +8,15 @@ import {
   Delete,
   Query,
   BadRequestException,
+  UseGuards,
 } from '@nestjs/common';
 import { StoreProductService } from './store-product.service';
 import { StoreProductDto } from './dto/store-product.dto';
 import { QueryParamUtils } from 'src/common/QueryParamUtils';
 import { StoreProduct } from './entities/store-product.entity';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('store-product')
 export class StoreProductController {
   constructor(private readonly storeProductService: StoreProductService) {}

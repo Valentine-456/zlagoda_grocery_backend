@@ -7,6 +7,7 @@ import { CustomerCardModule } from './customer-card/customer-card.module';
 import { EmployeeModule } from './employee/employee.module';
 import { StoreProductModule } from './store-product/store-product.module';
 import { CheckModule } from './check/check.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { CheckModule } from './check/check.module';
     EmployeeModule,
     StoreProductModule,
     CheckModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],

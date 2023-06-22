@@ -7,11 +7,14 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { CustomerCardService } from './customer-card.service';
 import { CustomerCardDto } from './dto/customer-card.dto';
 import { QueryParamUtils } from 'src/common/QueryParamUtils';
+import { AuthGuard } from 'src/auth/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('/customer-card')
 export class CustomerCardController {
   constructor(private readonly customerCardService: CustomerCardService) {}
