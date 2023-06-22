@@ -15,12 +15,16 @@ import { StoreProductDto } from './dto/store-product.dto';
 import { QueryParamUtils } from 'src/common/QueryParamUtils';
 import { StoreProduct } from './entities/store-product.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { EmployeeRoles } from 'src/employee/entities/employee.roles';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('store-product')
 export class StoreProductController {
   constructor(private readonly storeProductService: StoreProductService) {}
 
+  @Roles(EmployeeRoles.manager)
   @Post()
   async create(@Body() storeProductDto: StoreProductDto) {
     const similarStoreProducts: Array<StoreProduct> =
@@ -54,34 +58,40 @@ export class StoreProductController {
     return await this.storeProductService.create(storeProductDto);
   }
 
+  @Roles(EmployeeRoles.manager, EmployeeRoles.cashier)
   @Get()
   findAll(@Query('sortBy') sortByQuery?: string) {
     const sortBy = QueryParamUtils.sortByParamToSQL(sortByQuery);
     return this.storeProductService.findAll({ sortBy });
   }
 
+  @Roles(EmployeeRoles.manager, EmployeeRoles.cashier)
   @Get('promotional')
   findAllPromotional(@Query('sortBy') sortByQuery?: string) {
     const sortBy = QueryParamUtils.sortByParamToSQL(sortByQuery);
     return this.storeProductService.findAllPromotional({ sortBy });
   }
 
+  @Roles(EmployeeRoles.manager, EmployeeRoles.cashier)
   @Get('nonpromotional')
   findAllNonpromotional(@Query('sortBy') sortByQuery?: string) {
     const sortBy = QueryParamUtils.sortByParamToSQL(sortByQuery);
     return this.storeProductService.findAllNonpromotional({ sortBy });
   }
 
+  @Roles(EmployeeRoles.manager, EmployeeRoles.cashier)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.storeProductService.findOne(id);
   }
 
+  @Roles(EmployeeRoles.manager)
   @Patch(':id')
   update(@Param('id') id: string, @Body() storeProductDto: StoreProductDto) {
     return this.storeProductService.update(id, storeProductDto);
   }
 
+  @Roles(EmployeeRoles.manager)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.storeProductService.remove(id);

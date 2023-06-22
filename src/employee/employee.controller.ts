@@ -16,12 +16,15 @@ import { QueryParamUtils } from 'src/common/QueryParamUtils';
 import { PassEncryptionUtils } from 'src/common/PassEncryptionUtils';
 import { EmployeeRoles } from './entities/employee.roles';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
 
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 @Controller('employee')
 export class EmployeeController {
   constructor(private readonly employeeService: EmployeeService) {}
 
+  @Roles(EmployeeRoles.manager)
   @Post()
   async create(@Body() employeeDto: EmployeeDto) {
     const passEncrypted = await PassEncryptionUtils.encryptPassword(
@@ -31,12 +34,14 @@ export class EmployeeController {
     return this.employeeService.create(employeeDto);
   }
 
+  @Roles(EmployeeRoles.manager)
   @Get()
   findAll(@Query('sortBy') sortByQuery?: string) {
     const sortBy = QueryParamUtils.sortByParamToSQL(sortByQuery);
     return this.employeeService.findAll({ sortBy });
   }
 
+  @Roles(EmployeeRoles.manager)
   @Get('position/:role')
   findAllEmployees(
     @Param('role', new ParseEnumPipe(EmployeeRoles)) role: string,
@@ -46,6 +51,7 @@ export class EmployeeController {
     return this.employeeService.findAllByPosition(role, { sortBy });
   }
 
+  @Roles(EmployeeRoles.manager)
   @Get('searchBySurname/:surname')
   async findContactsBySurname(@Param('surname') surname: string) {
     const employees = await this.employeeService.findBySurname(surname);
@@ -71,11 +77,13 @@ export class EmployeeController {
     return contacts;
   }
 
+  @Roles(EmployeeRoles.cashier)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.employeeService.findOne(id);
   }
 
+  @Roles(EmployeeRoles.manager)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() employeeDto: EmployeeDto) {
     const passEncrypted = await PassEncryptionUtils.encryptPassword(
@@ -85,6 +93,7 @@ export class EmployeeController {
     return this.employeeService.update(id, employeeDto);
   }
 
+  @Roles(EmployeeRoles.manager)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.employeeService.remove(id);
