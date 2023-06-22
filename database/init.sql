@@ -39,7 +39,6 @@ CREATE TABLE IF NOT EXISTS Employee (
   city VARCHAR(50) NOT NULL,
   street VARCHAR(50) NOT NULL,
   zip_code VARCHAR(9) NOT NULL,
-  username VARCHAR(20) UNIQUE,
   pass VARCHAR(100) NOT NULL
 );
 
@@ -63,7 +62,7 @@ CREATE TABLE IF NOT EXISTS Store_Product (
   UPC_Prom VARCHAR(12) NULL,
   id_product INT NOT NULL,
   selling_price NUMERIC(13, 4) NOT NULL CHECK (selling_price > 0),
-  products_nubmer INT NOT NULL CHECK (products_nubmer > 0),
+  products_nubmer INT NOT NULL CHECK (products_nubmer >= 0),
   promotional_product BOOLEAN NOT NULL,
   FOREIGN KEY(UPC_Prom)
         REFERENCES Store_Product (UPC)
