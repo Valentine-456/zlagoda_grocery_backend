@@ -11,6 +11,5 @@ export class EmployeeDto {
   city: string;
   street: string;
   zip_code: string;
-  username: string;
-  pass: string;
+  pass: string | null;
 }

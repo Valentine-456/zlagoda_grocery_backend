@@ -28,7 +28,6 @@ export class CustomerCardController {
     return this.customerCardService.create(customerCardDto);
   }
 
-  @Roles(EmployeeRoles.manager)
   @Get()
   findAll(@Query('sortBy') sortBy?: string) {
     const sortBySQL = QueryParamUtils.sortByParamToSQL(sortBy);

@@ -21,7 +21,6 @@ export class EmployeeService {
     city,
     street,
     zip_code,
-    username,
     pass,
   }: EmployeeDto) {
     const template = `INSERT INTO Employee(
@@ -37,9 +36,8 @@ export class EmployeeService {
       city,
       street,
       zip_code,
-      username,
       pass
-    ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14) RETURNING *;`;
+    ) VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *;`;
     const params = [
       id_employee,
       empl_name,
@@ -53,7 +51,6 @@ export class EmployeeService {
       city,
       street,
       zip_code,
-      username,
       pass,
     ];
     const result = await this.dbPool.query(template, params);
@@ -100,42 +97,26 @@ export class EmployeeService {
       city,
       street,
       zip_code,
-      username,
       pass,
     }: EmployeeDto,
   ) {
+    const passwordUpdateSQL =
+      !!pass && pass.length > 0 ? ` , pass = '${pass}' ` : ``;
     const template = `UPDATE Employee SET
-      empl_name = $2,
-      empl_surname = $3,
-      empl_patronimic = $4,
-      empl_role = $5,
-      salary = $6,
-      date_of_birth = $7,
-      date_of_start = $8,
-      phone_number = $9,
-      city = $10,
-      street = $11,
-      zip_code = $12,
-      username = $13,
-      pass = $14
-    WHERE id_employee = $1 RETURNING *;`;
-    const params = [
-      id,
-      empl_name,
-      empl_surname,
-      empl_patronimic,
-      empl_role,
-      salary,
-      date_of_birth,
-      date_of_start,
-      phone_number,
-      city,
-      street,
-      zip_code,
-      username,
-      pass,
-    ];
-    const result = await this.dbPool.query(template, params);
+      empl_name = '${empl_name}',
+      empl_surname = '${empl_surname}',
+      empl_patronimic = '${empl_patronimic}',
+      empl_role = '${empl_role}',
+      salary = ${salary},
+      date_of_birth = '${date_of_birth}',
+      date_of_start = '${date_of_start}',
+      phone_number = '${phone_number}',
+      city = '${city}',
+      street = '${street}',
+      zip_code = '${zip_code}' ${passwordUpdateSQL}
+    WHERE id_employee = '${id}' RETURNING *;`;
+
+    const result = await this.dbPool.query(template);
     return result.rows[0];
   }
 

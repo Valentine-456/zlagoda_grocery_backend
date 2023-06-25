@@ -9,6 +9,7 @@ import {
   Query,
   ParseEnumPipe,
   UseGuards,
+  BadRequestException,
 } from '@nestjs/common';
 import { EmployeeService } from './employee.service';
 import { EmployeeDto } from './dto/employee.dto';
@@ -27,6 +28,8 @@ export class EmployeeController {
   @Roles(EmployeeRoles.manager)
   @Post()
   async create(@Body() employeeDto: EmployeeDto) {
+    if (!employeeDto.pass || employeeDto.pass.length == 0)
+      throw new BadRequestException('You need a "pass" parameter specified');
     const passEncrypted = await PassEncryptionUtils.encryptPassword(
       employeeDto.pass,
     );
@@ -77,7 +80,7 @@ export class EmployeeController {
     return contacts;
   }
 
-  @Roles(EmployeeRoles.cashier)
+  @Roles(EmployeeRoles.cashier, EmployeeRoles.manager)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.employeeService.findOne(id);
@@ -86,10 +89,13 @@ export class EmployeeController {
   @Roles(EmployeeRoles.manager)
   @Patch(':id')
   async update(@Param('id') id: string, @Body() employeeDto: EmployeeDto) {
-    const passEncrypted = await PassEncryptionUtils.encryptPassword(
-      employeeDto.pass,
-    );
-    employeeDto.pass = passEncrypted;
+    let passEncrypted;
+    if (!(!employeeDto.pass || employeeDto.pass.length == 0)) {
+      passEncrypted = await PassEncryptionUtils.encryptPassword(
+        employeeDto.pass,
+      );
+      employeeDto.pass = passEncrypted;
+    } else employeeDto.pass = null;
     return this.employeeService.update(id, employeeDto);
   }
 

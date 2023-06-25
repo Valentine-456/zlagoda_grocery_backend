@@ -7,10 +7,11 @@ import { AppModule } from './app.module';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(
+  const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    // new FastifyAdapter(),
+    new FastifyAdapter(),
   );
+  app.enableCors();
   await app.listen(3000, '0.0.0.0');
 }
 bootstrap();
