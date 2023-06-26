@@ -59,6 +59,21 @@ export class CustomerCardService {
     return result.rows;
   }
 
+  async findActiveCustomers() {
+    const result = await this.dbPool.query(
+      `SELECT *
+      FROM Customer_Card AS C_C
+      WHERE NOT EXISTS( SELECT id_employee
+              FROM Employee AS E
+              WHERE E.empl_role = 'CASHIER' and id_employee NOT IN ( SELECT id_employee
+                      FROM public.Check AS C
+                      WHERE C.card_number = C_C.card_number
+              )
+      );`,
+    );
+    return result.rows;
+  }
+
   async findOne(id: string) {
     const template = 'SELECT * FROM Customer_Card WHERE card_number = $1;';
     const params = [id];

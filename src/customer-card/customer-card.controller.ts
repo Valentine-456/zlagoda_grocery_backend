@@ -39,6 +39,12 @@ export class CustomerCardController {
     return this.customerCardService.findBySurname(surname);
   }
 
+  @Roles(EmployeeRoles.manager)
+  @Get('statistics/activeCustomers')
+  findActiveStatistics() {
+    return this.customerCardService.findActiveCustomers();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.customerCardService.findOne(id);

@@ -39,6 +39,19 @@ export class ProductController {
     return await this.productService.findAll({ sortBy: sqlSortBy, category });
   }
 
+  @Roles(EmployeeRoles.manager)
+  @Get('/statistics/multiplePropositions')
+  async findMultiplePropositionsSatistics(
+    @Query('sortBy') sortBy?: string,
+    @Query('category') category: string = null,
+  ) {
+    const sqlSortBy: string = QueryParamUtils.sortByParamToSQL(sortBy);
+    return await this.productService.findMultiplePropositionsProducts({
+      sortBy: sqlSortBy,
+      category,
+    });
+  }
+
   @Roles(EmployeeRoles.cashier)
   @Get('searchByName/:name')
   async findByName(@Param('name') name: string) {

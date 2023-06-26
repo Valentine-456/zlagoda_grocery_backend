@@ -37,6 +37,25 @@ export class ProductService {
     return result.rows;
   }
 
+  async findMultiplePropositionsProducts({
+    sortBy,
+    category = null,
+  }: ProductAPIQueryParams) {
+    const searchByCategory =
+      category != null ? ` WHERE C.category_name = '${category}' ` : ' ';
+
+    const result = await this.dbPool.query(
+      `SELECT P.product_name, P.charachteristics, C.category_name, P.id_product, Count(*)
+      FROM (Category AS C INNER JOIN Product AS P ON C.category_number = P.category_number) 
+      INNER JOIN Store_Product AS S_P ON P.id_product = S_P.id_product 
+      ${searchByCategory} 
+      GROUP BY P.product_name, P.charachteristics, C.category_name, P.id_product
+      HAVING Count(*)>1  
+      ${sortBy}`,
+    );
+    return result.rows;
+  }
+
   async findOne(id: number) {
     const template = `SELECT * FROM Product 
       INNER JOIN Category ON Product.category_number = Category.category_number 
