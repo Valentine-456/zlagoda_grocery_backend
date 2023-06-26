@@ -85,3 +85,33 @@ CREATE TABLE IF NOT EXISTS Sale (
         REFERENCES public.Check (check_number)
         ON DELETE CASCADE ON UPDATE CASCADE
 );
+
+INSERT INTO Employee(
+      id_employee,
+      empl_name,
+      empl_surname,
+      empl_patronimic,
+      empl_role,
+      salary,
+      date_of_birth,
+      date_of_start,
+      phone_number,
+      city,
+      street,
+      zip_code,
+      pass
+    ) VALUES(
+      '00001', 
+      'Oleh', 
+      'Ivanov', 
+      'Ivanovych', 
+      'MANAGER', 
+      4000, 
+      '1994-05-11', 
+      '2023-06-01', 
+      '+380765464', 
+      'New York', 
+      '7th avenue', 
+      '01103',
+      '4e8f6dc059fd3f39a3e77116758eaf86f923902661a7cdeb29a51ae105f4cb44:3b33a5ae29df95b5d56e84a054c70c87'
+      );
