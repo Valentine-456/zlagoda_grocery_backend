@@ -1,3 +1,4 @@
+import { join } from 'path';
 import { Module } from '@nestjs/common';
 import { DbModule } from './db/db.module';
 import { ConfigModule } from '@nestjs/config';
@@ -8,6 +9,7 @@ import { EmployeeModule } from './employee/employee.module';
 import { StoreProductModule } from './store-product/store-product.module';
 import { CheckModule } from './check/check.module';
 import { AuthModule } from './auth/auth.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 @Module({
   imports: [
@@ -20,6 +22,9 @@ import { AuthModule } from './auth/auth.module';
     StoreProductModule,
     CheckModule,
     AuthModule,
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, '..', 'client'),
+    }),
   ],
   controllers: [],
   providers: [],
